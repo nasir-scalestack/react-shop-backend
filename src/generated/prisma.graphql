@@ -311,7 +311,6 @@ input ItemCreateInput {
   image: String
   largeImage: String
   price: Int!
-  user: UserCreateOneInput!
 }
 
 input ItemCreateOneInput {
