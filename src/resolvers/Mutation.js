@@ -1,3 +1,4 @@
-const mutations = {};
+// Mutation resolver (push data)
+const Mutations = {};
 
-module.exports = mutations;
+module.exports = Mutations;
