@@ -9,16 +9,16 @@ const server = createServer();
 
 server.express.use(cookieParser());
 
-// decode the jwt so we can get the user id on each req
+// decode the JWT so we can get the user Id on each request
 server.express.use((req, res, next) => {
-    const { token } = req.cookies;
-    if(token) {
-        const  { userid } = jwt.verify(token, process.env.APP_SECRET);
-        // put the userid onto the request for further requests to access
-        req.userId = userId;
-    }
-    next();
-})
+  const { token } = req.cookies;
+  if (token) {
+    const { userId } = jwt.verify(token, process.env.APP_SECRET);
+    // put the userId onto the req for future requests to access
+    req.userId = userId;
+  }
+  next();
+});
 
 server.start({
     cors: {
