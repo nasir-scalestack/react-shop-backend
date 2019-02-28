@@ -245,7 +245,7 @@ const Mutations = {
     }, 
      `{ id, user { id }}` 
     );
-    if!(cartItem) throw new Error("Item does not item");
+    if(!cartItem) throw new Error("Item does not item");
 
     if(cartItem.user.id !== ctx.request.userId) throw new Error("Cheating huh?");
 
