@@ -838,6 +838,7 @@ input OrderItemCreateInput {
   largeImage: String
   price: Int!
   quantity: Int
+  user: UserCreateOneInput
 }
 
 input OrderItemCreateManyInput {

@@ -266,10 +266,10 @@ const Mutations = {
     const user = await ctx.db.query.user({ where: { id: userId }},
        `
        {
-         id 
-       name 
-       email 
-       cart { 
+        id 
+        name 
+        email 
+        cart { 
          id 
          quantity 
          item { 
@@ -278,6 +278,7 @@ const Mutations = {
            id 
            description 
            image
+           largeImage
           }
         }
       }`
@@ -289,6 +290,36 @@ const Mutations = {
       source: args.token,
     })
 
+    const orderItems = user.cart.map(cartItem => {
+      const orderItem = {
+        ...cartItem.item,
+        largeImage: cartItem.item.image,
+        quantity: cartItem.quantity,
+        user: { 
+          connect: { 
+            id: userId 
+          }
+        }
+      }
+      delete orderItem.id;
+      return orderItem;
+    })
+
+    const order = await ctx.db.mutation.createOrder({
+      data: {
+        total: charge.amount,
+        charge: charge.id,
+        items: { create: orderItems },
+        user: { connect: { id: userId }}
+      }
+    })
+
+    const cartItemIds = user.cart.map(cartItem => cartItem.id);
+    await ctx.db.mutation.deleteManyCartItems({ where: {
+      id_in: cartItemIds
+    }});
+
+    return order;
   }
 };
   
