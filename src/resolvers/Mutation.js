@@ -4,6 +4,7 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const { hasPermission } = require('../utils');
 const  { transport, makeANiceEmail } = require('../mail');
+const stripe = require('../stripe');
 
 const Mutations = {
   async createItem(parent, args, ctx, info) {
@@ -256,6 +257,38 @@ const Mutations = {
     }, info)
     // 2. make sure they own the cart item
     // 3. delete cart item
+  },
+  async createOrder(parent, args, ctx, info){
+    const { userId } = ctx.request;
+    if (!userId) {
+      throw new Error('You must be signed in soooon');
+    }
+    const user = await ctx.db.query.user({ where: { id: userId }},
+       `
+       {
+         id 
+       name 
+       email 
+       cart { 
+         id 
+         quantity 
+         item { 
+           title 
+           price 
+           id 
+           description 
+           image
+          }
+        }
+      }`
+    );
+    const amount = user.cart.reduce((tally, cartItem) => tally + cartItem.item.price * cartItem.quantity , 0);
+    const charge = await stripe.charges.create({
+      amount: amount,
+      currency: 'CAD',
+      source: args.token,
+    })
+
   }
 };
   
