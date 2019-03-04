@@ -27,6 +27,32 @@ const Query = {
 
     // 3.if they do, query all the users
     return ctx.db.query.users({}, info);
+  },
+  async order(parent, args, ctx, info){
+    const { userId } = ctx.request;
+    if(!userId) {
+      throw new Error('You are not logged in');
+    }
+    const order = await ctx.db.query.order({
+      where: { id: args.id }
+    }, info)
+    const ownsOrder = order.user.id === userId;
+    const hasPermissionOrder = ctx.request.user.permissions.includes('ADMIN');
+    if(!ownsOrder || !hasPermission){
+      throw new Error ("Invalid permission");
+    } 
+    return order;
+  },
+  async orders(parent, args, ctx, info){
+    const { userId } = ctx.request;
+    if(!userId){
+      throw new Error('You are not logged in');
+    }
+    return ctx.db.query.orders({
+      where: {
+        user: { id: userId }
+      }
+    }, info);
   }
 };
 
